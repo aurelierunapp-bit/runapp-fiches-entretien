@@ -1,0 +1,1196 @@
+<!doctype html>
+<!--
+  ============================================================================
+  RunApp — Fiches d'entretien (3 fiches uniquement)
+  ============================================================================
+  
+  Créatrice : SALMACIS Aurélie
+  Fonction : Assistante Pédagogique
+  Date de création : Février 2026
+  Version : 3.0 (3 fiches uniquement)
+  
+  © 2026 SALMACIS Aurélie - Tous droits réservés
+  Plateforme développée pour RunApp
+  
+  Ce fichier contient les 3 fiches d'entretien pédagogique :
+  - Fiche 1 : Entretien d'accueil / Positionnement
+  - Fiche 2 : Entretien trimestriel / Mi-parcours
+  - Fiche 3 : Entretien de bilan final
+  
+  Ces fiches peuvent être utilisées de manière autonome ou couplées
+  avec la plateforme V5 Module Analyse pour un suivi global.
+  ============================================================================
+-->
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RunApp — Fiches d'entretien (Accueil • Trimestriel • Bilan)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --runapp-red:#E30613; --dark:#2E2E2E; --mid:#6F6F6F; --light:#EDEDED; --white:#FFFFFF; --border:#cfcfcf;
+    }
+    *{ box-sizing:border-box; }
+    html, body{ margin:0; padding:0; background:var(--white); color:var(--dark); }
+    body{ font-family:"Open Sans", Arial, sans-serif; font-size:13px; line-height:1.35; }
+    .page{ max-width:1100px; margin:0 auto; padding:26px; }
+    header{ border-bottom:2px solid var(--light); padding-bottom:14px; margin-bottom:18px; }
+    .brand-row{ display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+    .brand-row img{ height:46px; width:auto; display:block; }
+    .org{ font-family:"Montserrat", Arial, sans-serif; font-weight:700; color:var(--dark); font-size:13px; margin:0; }
+    h1{ font-family:"Montserrat", Arial, sans-serif; font-weight:700; color:var(--runapp-red); font-size:22px; margin:0; }
+    .subtitle{ margin:8px 0 0 0; color:var(--mid); font-size:12px; max-width:950px; }
+
+    /* Navigation entre fiches */
+    .fiche-nav{ display:flex; gap:8px; margin:12px 0; flex-wrap:wrap; }
+    .fiche-nav button{ border:1px solid var(--border); background:var(--white); color:var(--dark); font-family:"Open Sans", Arial, sans-serif; font-size:13px; padding:9px 14px; cursor:pointer; transition:all .2s ease; }
+    .fiche-nav button.active{ border-color:var(--runapp-red); background:var(--runapp-red); color:var(--white); font-weight:600; }
+    .fiche-nav button:hover:not(.active){ border-color:var(--runapp-red); color:var(--runapp-red); }
+
+    .fiche-container{ display:none; }
+    .fiche-container.active{ display:block; }
+
+    .action-bar{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    button{ border:1px solid var(--border); background:var(--white); color:var(--dark); font-family:"Open Sans", Arial, sans-serif; font-size:13px; padding:9px 12px; cursor:pointer; }
+    button.primary{ border-color:var(--runapp-red); color:var(--runapp-red); font-weight:600; }
+
+    .section{ margin-top:16px; padding:14px; background:var(--light); }
+    .section h2{ font-family:"Montserrat", Arial, sans-serif; font-weight:700; font-size:16px; margin:0 0 10px 0; }
+    .hint{ color:var(--mid); font-size:12px; margin:0 0 10px 0; }
+
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; }
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    label{ font-size:12px; font-weight:600; }
+    input[type="text"], input[type="date"], select, textarea{
+      width:100%; padding:9px 10px; border:1px solid var(--border); background:var(--white); color:var(--dark);
+      font-family:"Open Sans", Arial, sans-serif; font-size:13px; border-radius:0; outline:none;
+    }
+    textarea{ min-height:92px; resize:vertical; }
+
+    .divider{ height:1px; background:#d9d9d9; margin:12px 0; }
+
+    table{ width:100%; border-collapse:collapse; background:var(--white); }
+    th, td{ border:1px solid var(--border); padding:10px; vertical-align:top; text-align:left; font-size:13px; }
+    th{ font-family:"Montserrat", Arial, sans-serif; font-weight:700; background:#f7f7f7; }
+
+    .radio-row{ display:flex; gap:14px; flex-wrap:wrap; margin-top:6px; }
+    .radio-row label{ font-weight:400; display:flex; align-items:center; gap:8px; }
+
+    .error-box{
+      display:none;
+      margin-top:10px;
+      padding:10px;
+      background:var(--white);
+      border:1px solid var(--border);
+      color:var(--dark);
+      font-size:12px;
+    }
+    .error-box strong{ color:var(--runapp-red); font-family:"Montserrat", Arial, sans-serif; font-weight:700; }
+
+    .save-indicator{ position:fixed; bottom:18px; right:18px; background:var(--dark); color:var(--white); padding:10px 12px; font-size:12px; opacity:0; transition:opacity .2s ease; z-index:1000; }
+    .save-indicator.show{ opacity:1; }
+    .footer{ margin-top:18px; padding-top:12px; border-top:2px solid var(--light); color:var(--mid); font-size:12px; }
+
+    /* Styles pour la zone de signature */
+    .signature-section{ margin-top:16px; padding:14px; background:var(--light); }
+    .signature-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .signature-box{ background:var(--white); padding:12px; border:1px solid var(--border); }
+    .signature-box h3{ font-family:"Montserrat", Arial, sans-serif; font-weight:700; font-size:14px; margin:0 0 10px 0; }
+    .signature-canvas-wrapper{ border:1px solid var(--border); background:var(--white); margin:10px 0; position:relative; }
+    .signature-canvas{ display:block; cursor:crosshair; touch-action:none; }
+    .signature-actions{ display:flex; gap:8px; margin-top:8px; }
+    .signature-actions button{ padding:6px 10px; font-size:12px; }
+    .engagement-text{ margin-bottom:10px; }
+    .engagement-text textarea{ min-height:60px; }
+
+    /* Styles pour l'analyse */
+    .analysis-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+    .analysis-card{ background:var(--white); padding:16px; border:1px solid var(--border); }
+    .analysis-card h3{ font-family:"Montserrat", Arial, sans-serif; font-weight:700; font-size:15px; margin:0 0 12px 0; color:var(--runapp-red); }
+    .stat-row{ display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--light); }
+    .stat-row:last-child{ border-bottom:none; }
+    .stat-label{ font-weight:600; color:var(--mid); }
+    .stat-value{ font-weight:700; color:var(--dark); font-size:18px; }
+    .chart-container{ margin-top:12px; }
+    .bar-chart{ display:flex; flex-direction:column; gap:10px; }
+    .bar-item{ display:flex; align-items:center; gap:10px; }
+    .bar-label{ min-width:120px; font-size:12px; font-weight:600; }
+    .bar-track{ flex:1; height:24px; background:var(--light); position:relative; border:1px solid var(--border); }
+    .bar-fill{ height:100%; background:var(--runapp-red); transition:width 0.3s ease; }
+    .bar-value{ min-width:40px; text-align:right; font-weight:700; }
+    .synthesis-box{ background:#f9f9f9; padding:14px; border-left:4px solid var(--runapp-red); margin-top:12px; }
+    .synthesis-box p{ margin:0 0 8px 0; line-height:1.6; }
+    .synthesis-box p:last-child{ margin:0; }
+    .alert-box{ background:#fff3cd; border:1px solid #ffc107; padding:12px; margin-top:12px; border-radius:4px; }
+    .alert-box strong{ color:#856404; }
+    .success-box{ background:#d4edda; border:1px solid #28a745; padding:12px; margin-top:12px; border-radius:4px; }
+    .success-box strong{ color:#155724; }
+
+    @media print{ 
+      .action-bar,.save-indicator,.fiche-nav,.signature-actions{ display:none; } 
+      body{ font-size:12px; }
+      .signature-canvas{ border:1px solid #000; }
+    }
+    @media (max-width: 860px){ 
+      .grid{ grid-template-columns:1fr; } 
+      .page{ padding:16px; }
+      .signature-grid{ grid-template-columns:1fr; }
+      .analysis-grid{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header>
+      <div class="brand-row">
+        <img
+          src="https://page.gensparksite.com/get_upload_url/a807509ac51f0aafab2f4e9e83f6921712f3927abdf2ad1fab8d0ffb237a4508/default/721147c8-c177-496d-a46d-0254ab7d7d24"
+          alt="RunApp"
+        />
+        <p class="org">RunApp – Conseil, Formation, Accompagnement</p>
+      </div>
+
+      <h1>Fiches d'entretien — Parcours de formation</h1>
+      <p class="subtitle">
+        Outils de suivi pédagogique : diagnostic initial, suivi trimestriel et bilan final.
+      </p>
+
+      <div class="fiche-nav">
+        <button class="active" onclick="switchFiche(1)">Fiche 1 — Accueil</button>
+        <button onclick="switchFiche(2)">Fiche 2 — Trimestriel</button>
+        <button onclick="switchFiche(3)">Fiche 3 — Bilan final</button>
+      </div>
+    </header>
+
+    <!-- ======================= FICHE 1 : ACCUEIL ======================= -->
+    <div id="fiche1" class="fiche-container active">
+      <div class="action-bar">
+        <button type="button" class="primary" onclick="printForm(1)">Imprimer / PDF</button>
+        <button type="button" onclick="exportJSON(1)">Exporter JSON</button>
+        <button type="button" onclick="resetForm(1)">Réinitialiser</button>
+      </div>
+
+      <form id="runappForm1">
+        <section class="section">
+          <h2>1) Informations générales</h2>
+
+          <div class="grid">
+            <div class="field">
+              <label for="f1_ref_dossier">Référence dossier / ID apprenant</label>
+              <input id="f1_ref_dossier" name="ref_dossier" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f1_date_entretien">Date de l'entretien (JJ/MM/AAAA)</label>
+              <input id="f1_date_entretien" name="date_entretien" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+              <div style="color:#6F6F6F;font-size:11px;">Exemple : 15/02/2026</div>
+            </div>
+
+            <div class="field">
+              <label for="f1_nom_prenom">Apprenant (nom, prénom)</label>
+              <input id="f1_nom_prenom" name="nom_prenom" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f1_formation">Formation visée</label>
+              <input id="f1_formation" name="formation" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f1_date_debut_formation">Date de début de formation (JJ/MM/AAAA)</label>
+              <input id="f1_date_debut_formation" name="date_debut_formation" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+            </div>
+
+            <div class="field">
+              <label for="f1_intervenant">Intervenant(s) RunApp</label>
+              <input id="f1_intervenant" name="intervenant" type="text" />
+            </div>
+          </div>
+
+          <div id="f1_dateErrors" class="error-box" role="alert" aria-live="polite"></div>
+        </section>
+
+        <section class="section">
+          <h2>2) Parcours et projet de l'apprenant</h2>
+
+          <div class="field">
+            <label for="f1_parcours_anterieur">Parcours antérieur (études, expériences, certifications)</label>
+            <textarea id="f1_parcours_anterieur" name="parcours_anterieur"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f1_motivation">Motivation pour cette formation</label>
+            <textarea id="f1_motivation" name="motivation"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f1_projet_pro">Projet professionnel visé</label>
+            <textarea id="f1_projet_pro" name="projet_pro"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>3) Auto-évaluation initiale</h2>
+
+          <div class="field">
+            <label for="f1_competences_fortes">Compétences / connaissances déjà acquises</label>
+            <textarea id="f1_competences_fortes" name="competences_fortes"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f1_besoins_identifie">Besoins identifiés / axes de progrès</label>
+            <textarea id="f1_besoins_identifie" name="besoins_identifie"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f1_apprehensions">Appréhensions / freins éventuels</label>
+            <textarea id="f1_apprehensions" name="apprehensions"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>4) Objectifs personnels</h2>
+
+          <div class="field">
+            <label for="f1_objectifs">Objectifs personnels pour ce parcours</label>
+            <textarea id="f1_objectifs" name="objectifs"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f1_attentes">Attentes vis-à-vis de la formation et de l'accompagnement</label>
+            <textarea id="f1_attentes" name="attentes"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>5) Contraintes et besoins particuliers</h2>
+
+          <div class="field">
+            <label for="f1_contraintes">Contraintes ou besoins particuliers (mobilité, accessibilité, etc.)</label>
+            <textarea id="f1_contraintes" name="contraintes"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>6) Plan d'action initial</h2>
+
+          <div class="field">
+            <label for="f1_etapes_prevues">Étapes clés prévues</label>
+            <textarea id="f1_etapes_prevues" name="etapes_prevues"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f1_ressources">Ressources mobilisées (outils, supports, interlocuteurs)</label>
+            <textarea id="f1_ressources" name="ressources"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f1_prochain_rdv">Prochain rendez-vous (JJ/MM/AAAA)</label>
+            <input id="f1_prochain_rdv" name="prochain_rdv" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>7) Commentaires et observations (RunApp)</h2>
+
+          <div class="field">
+            <label for="f1_commentaires_runapp">Notes / recommandations / points d'attention</label>
+            <textarea id="f1_commentaires_runapp" name="commentaires_runapp" style="min-height: 130px;"></textarea>
+          </div>
+        </section>
+
+        <!-- ZONE DE SIGNATURE FICHE 1 -->
+        <section class="signature-section">
+          <h2>Engagement et signatures</h2>
+          <div class="signature-grid">
+            <div class="signature-box">
+              <h3>L'apprenant</h3>
+              <div class="engagement-text">
+                <label for="f1_engagement_apprenant" style="font-weight:400;">Je m'engage à suivre le parcours de formation dans les conditions définies :</label>
+                <textarea id="f1_engagement_apprenant" name="engagement_apprenant" placeholder="Commentaire ou engagement (optionnel)"></textarea>
+              </div>
+              <label style="font-weight:600; display:block; margin-bottom:6px;">Signature :</label>
+              <div class="signature-canvas-wrapper">
+                <canvas id="f1_canvas_apprenant" class="signature-canvas" width="400" height="150"></canvas>
+              </div>
+              <div class="signature-actions">
+                <button type="button" onclick="clearSignature('f1_canvas_apprenant')">Effacer</button>
+              </div>
+            </div>
+
+            <div class="signature-box">
+              <h3>L'intervenant RunApp</h3>
+              <div class="engagement-text">
+                <label for="f1_engagement_intervenant" style="font-weight:400;">Je certifie avoir mené cet entretien et pris en compte les besoins de l'apprenant :</label>
+                <textarea id="f1_engagement_intervenant" name="engagement_intervenant" placeholder="Commentaire ou engagement (optionnel)"></textarea>
+              </div>
+              <label style="font-weight:600; display:block; margin-bottom:6px;">Signature :</label>
+              <div class="signature-canvas-wrapper">
+                <canvas id="f1_canvas_intervenant" class="signature-canvas" width="400" height="150"></canvas>
+              </div>
+              <div class="signature-actions">
+                <button type="button" onclick="clearSignature('f1_canvas_intervenant')">Effacer</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    <!-- ======================= FICHE 2 : TRIMESTRIEL ======================= -->
+    <div id="fiche2" class="fiche-container">
+      <div class="action-bar">
+        <button type="button" class="primary" onclick="printForm(2)">Imprimer / PDF</button>
+        <button type="button" onclick="exportJSON(2)">Exporter JSON</button>
+        <button type="button" onclick="resetForm(2)">Réinitialiser</button>
+      </div>
+
+      <form id="runappForm2">
+        <section class="section">
+          <h2>1) Informations générales</h2>
+
+          <div class="grid">
+            <div class="field">
+              <label for="f2_ref_dossier">Référence dossier / ID apprenant</label>
+              <input id="f2_ref_dossier" name="ref_dossier" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f2_date_entretien">Date de l'entretien (JJ/MM/AAAA)</label>
+              <input id="f2_date_entretien" name="date_entretien" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+              <div style="color:#6F6F6F;font-size:11px;">Exemple : 15/02/2026</div>
+            </div>
+
+            <div class="field">
+              <label for="f2_nom_prenom">Apprenant (nom, prénom)</label>
+              <input id="f2_nom_prenom" name="nom_prenom" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f2_formation">Formation</label>
+              <input id="f2_formation" name="formation" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f2_periode_debut">Période couverte — début (JJ/MM/AAAA)</label>
+              <input id="f2_periode_debut" name="periode_debut" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+            </div>
+
+            <div class="field">
+              <label for="f2_periode_fin">Période couverte — fin (JJ/MM/AAAA)</label>
+              <input id="f2_periode_fin" name="periode_fin" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+            </div>
+
+            <div class="field">
+              <label for="f2_intervenant">Intervenant(s) RunApp</label>
+              <input id="f2_intervenant" name="intervenant" type="text" />
+            </div>
+          </div>
+
+          <div id="f2_dateErrors" class="error-box" role="alert" aria-live="polite"></div>
+        </section>
+
+        <section class="section">
+          <h2>2) Bilan des actions menées</h2>
+
+          <div class="field">
+            <label for="f2_actions_realisees">Actions menées / modules suivis</label>
+            <textarea id="f2_actions_realisees" name="actions_realisees"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f2_realisations">Réalisations ou livrables</label>
+            <textarea id="f2_realisations" name="realisations"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f2_participation">Participation / assiduité</label>
+            <textarea id="f2_participation" name="participation"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>3) Acquisition des compétences</h2>
+
+          <div class="field">
+            <label for="f2_competences_acquises">Compétences / connaissances acquises ou renforcées</label>
+            <textarea id="f2_competences_acquises" name="competences_acquises"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f2_points_forts">Points forts observés</label>
+            <textarea id="f2_points_forts" name="points_forts"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f2_axes_amelioration">Axes d'amélioration identifiés</label>
+            <textarea id="f2_axes_amelioration" name="axes_amelioration"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>4) Difficultés et freins rencontrés</h2>
+
+          <div class="field">
+            <label for="f2_difficultes">Difficultés rencontrées (pédagogiques, techniques, personnelles)</label>
+            <textarea id="f2_difficultes" name="difficultes"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f2_solutions_mises">Solutions mises en place ou envisagées</label>
+            <textarea id="f2_solutions_mises" name="solutions_mises"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>5) Motivation et ressenti</h2>
+
+          <p class="hint" style="margin:0 0 12px 0;">Évaluation de 1 (très faible) à 5 (très forte)</p>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; margin-bottom:6px;">Niveau de motivation actuel</label>
+            <div class="radio-row">
+              <label><input type="radio" name="niveau_motivation" value="1" /> 1</label>
+              <label><input type="radio" name="niveau_motivation" value="2" /> 2</label>
+              <label><input type="radio" name="niveau_motivation" value="3" /> 3</label>
+              <label><input type="radio" name="niveau_motivation" value="4" /> 4</label>
+              <label><input type="radio" name="niveau_motivation" value="5" /> 5</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f2_ressenti_general">Ressenti général de l'apprenant</label>
+            <textarea id="f2_ressenti_general" name="ressenti_general"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>6) Objectifs pour la période suivante</h2>
+
+          <div class="field">
+            <label for="f2_objectifs_suivants">Objectifs / modules à venir</label>
+            <textarea id="f2_objectifs_suivants" name="objectifs_suivants"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f2_priorites">Priorités d'apprentissage</label>
+            <textarea id="f2_priorites" name="priorites"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>7) Plan d'action</h2>
+          <p class="hint">Indiquer les actions concrètes, responsables et échéances.</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width:50%;">Action</th>
+                <th style="width:25%;">Responsable</th>
+                <th style="width:25%;">Échéance (JJ/MM/AAAA)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><textarea name="plan_action_1" style="width:100%; border:none; min-height:60px; padding:4px;"></textarea></td>
+                <td><input name="plan_resp_1" type="text" style="width:100%; border:none; padding:4px;" /></td>
+                <td><input name="plan_ech_1" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" style="width:100%; border:none; padding:4px;" /></td>
+              </tr>
+              <tr>
+                <td><textarea name="plan_action_2" style="width:100%; border:none; min-height:60px; padding:4px;"></textarea></td>
+                <td><input name="plan_resp_2" type="text" style="width:100%; border:none; padding:4px;" /></td>
+                <td><input name="plan_ech_2" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" style="width:100%; border:none; padding:4px;" /></td>
+              </tr>
+              <tr>
+                <td><textarea name="plan_action_3" style="width:100%; border:none; min-height:60px; padding:4px;"></textarea></td>
+                <td><input name="plan_resp_3" type="text" style="width:100%; border:none; padding:4px;" /></td>
+                <td><input name="plan_ech_3" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" style="width:100%; border:none; padding:4px;" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section">
+          <h2>8) Commentaires et observations (RunApp)</h2>
+
+          <div class="field">
+            <label for="f2_commentaires_runapp">Notes / recommandations / ajustements</label>
+            <textarea id="f2_commentaires_runapp" name="commentaires_runapp" style="min-height: 130px;"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>9) Validation</h2>
+
+          <div style="margin-top:10px;">
+            <label style="display:flex; align-items:center; gap:10px; font-weight:400;">
+              <input type="checkbox" id="f2_validation_engagement" name="validation_engagement" />
+              L'apprenant confirme avoir pris connaissance de ce bilan et des prochaines étapes.
+            </label>
+          </div>
+        </section>
+
+        <!-- ZONE DE SIGNATURE FICHE 2 -->
+        <section class="signature-section">
+          <h2>Engagement et signatures</h2>
+          <div class="signature-grid">
+            <div class="signature-box">
+              <h3>L'apprenant</h3>
+              <div class="engagement-text">
+                <label for="f2_engagement_apprenant" style="font-weight:400;">Je confirme avoir pris connaissance de ce bilan et m'engage à suivre le plan d'action défini :</label>
+                <textarea id="f2_engagement_apprenant" name="engagement_apprenant" placeholder="Commentaire ou engagement (optionnel)"></textarea>
+              </div>
+              <label style="font-weight:600; display:block; margin-bottom:6px;">Signature :</label>
+              <div class="signature-canvas-wrapper">
+                <canvas id="f2_canvas_apprenant" class="signature-canvas" width="400" height="150"></canvas>
+              </div>
+              <div class="signature-actions">
+                <button type="button" onclick="clearSignature('f2_canvas_apprenant')">Effacer</button>
+              </div>
+            </div>
+
+            <div class="signature-box">
+              <h3>L'intervenant RunApp</h3>
+              <div class="engagement-text">
+                <label for="f2_engagement_intervenant" style="font-weight:400;">Je certifie l'exactitude de ce bilan et l'accompagnement continu de l'apprenant :</label>
+                <textarea id="f2_engagement_intervenant" name="engagement_intervenant" placeholder="Commentaire ou engagement (optionnel)"></textarea>
+              </div>
+              <label style="font-weight:600; display:block; margin-bottom:6px;">Signature :</label>
+              <div class="signature-canvas-wrapper">
+                <canvas id="f2_canvas_intervenant" class="signature-canvas" width="400" height="150"></canvas>
+              </div>
+              <div class="signature-actions">
+                <button type="button" onclick="clearSignature('f2_canvas_intervenant')">Effacer</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    <!-- ======================= FICHE 3 : BILAN FINAL ======================= -->
+    <div id="fiche3" class="fiche-container">
+      <div class="action-bar">
+        <button type="button" class="primary" onclick="printForm(3)">Imprimer / PDF</button>
+        <button type="button" onclick="exportJSON(3)">Exporter JSON</button>
+        <button type="button" onclick="resetForm(3)">Réinitialiser</button>
+      </div>
+
+      <form id="runappForm3">
+        <section class="section">
+          <h2>1) Informations générales</h2>
+
+          <div class="grid">
+            <div class="field">
+              <label for="f3_ref_dossier">Référence dossier / ID apprenant</label>
+              <input id="f3_ref_dossier" name="ref_dossier" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f3_date_entretien">Date de l'entretien (JJ/MM/AAAA)</label>
+              <input id="f3_date_entretien" name="date_entretien" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+              <div style="color:#6F6F6F;font-size:11px;">Exemple : 15/02/2026</div>
+            </div>
+
+            <div class="field">
+              <label for="f3_nom_prenom">Apprenant (nom, prénom)</label>
+              <input id="f3_nom_prenom" name="nom_prenom" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f3_formation">Formation</label>
+              <input id="f3_formation" name="formation" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="f3_date_debut_formation">Date de début de formation (JJ/MM/AAAA)</label>
+              <input id="f3_date_debut_formation" name="date_debut_formation" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+            </div>
+
+            <div class="field">
+              <label for="f3_date_fin_formation">Date de fin de formation (JJ/MM/AAAA)</label>
+              <input id="f3_date_fin_formation" name="date_fin_formation" type="text" inputmode="numeric" placeholder="JJ/MM/AAAA" />
+            </div>
+
+            <div class="field">
+              <label for="f3_intervenant">Intervenant(s) RunApp</label>
+              <input id="f3_intervenant" name="intervenant" type="text" />
+            </div>
+          </div>
+
+          <div id="f3_dateErrors" class="error-box" role="alert" aria-live="polite"></div>
+        </section>
+
+        <section class="section">
+          <h2>2) Bilan global du parcours</h2>
+
+          <div class="field">
+            <label for="f3_parcours_resume">Résumé du parcours suivi</label>
+            <textarea id="f3_parcours_resume" name="parcours_resume" style="min-height: 110px;"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f3_taux_presence">Taux de présence / assiduité (%)</label>
+            <input id="f3_taux_presence" name="taux_presence" type="text" />
+          </div>
+
+          <div class="field">
+            <label for="f3_implication">Implication générale (qualitative)</label>
+            <textarea id="f3_implication" name="implication"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>3) Compétences et acquis</h2>
+
+          <div class="field">
+            <label for="f3_competences_maitrisees">Compétences maîtrisées en fin de formation</label>
+            <textarea id="f3_competences_maitrisees" name="competences_maitrisees" style="min-height: 110px;"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f3_progres_realises">Principaux progrès réalisés</label>
+            <textarea id="f3_progres_realises" name="progres_realises" style="min-height: 110px;"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f3_points_vigilance">Points restant à consolider / vigilance</label>
+            <textarea id="f3_points_vigilance" name="points_vigilance"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>4) Évaluation finale</h2>
+
+          <div class="field">
+            <label for="f3_date_certification">Date / Période d'examen (JJ/MM/AAAA ou période)</label>
+            <input id="f3_date_certification" name="date_certification" type="text" inputmode="numeric" placeholder="Ex: 15/06/2026 ou Juin 2026" />
+            <div style="color:#6F6F6F;font-size:11px;">L'entretien final se déroule avant les examens</div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>5) Perspectives et suite du parcours</h2>
+
+          <div class="field">
+            <label for="f3_projet_post_formation">Projet post-formation (emploi recherché, poursuite d'études, création d'activité)</label>
+            <textarea id="f3_projet_post_formation" name="projet_post_formation" style="min-height: 110px;"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f3_accompagnement_propose">Accompagnement proposé ou recommandé (suite, orientation, partenaires)</label>
+            <textarea id="f3_accompagnement_propose" name="accompagnement_propose"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f3_demarches_en_cours">Démarches en cours ou prévues (candidatures, prospections, démarches administratives)</label>
+            <textarea id="f3_demarches_en_cours" name="demarches_en_cours"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>6) Retour d'expérience de l'apprenant</h2>
+
+          <div class="field">
+            <label for="f3_satisfaction_formation">Satisfaction globale de la formation (1 à 5)</label>
+            <div class="radio-row">
+              <label><input type="radio" name="satisfaction_formation" value="1" /> 1</label>
+              <label><input type="radio" name="satisfaction_formation" value="2" /> 2</label>
+              <label><input type="radio" name="satisfaction_formation" value="3" /> 3</label>
+              <label><input type="radio" name="satisfaction_formation" value="4" /> 4</label>
+              <label><input type="radio" name="satisfaction_formation" value="5" /> 5</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f3_points_positifs">Points positifs relevés</label>
+            <textarea id="f3_points_positifs" name="points_positifs"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f3_ameliorations_suggerees">Suggestions d'amélioration</label>
+            <textarea id="f3_ameliorations_suggerees" name="ameliorations_suggerees"></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>7) Commentaires finaux (RunApp)</h2>
+
+          <div class="field">
+            <label for="f3_commentaires_runapp">Observations / recommandations / suivi éventuel</label>
+            <textarea id="f3_commentaires_runapp" name="commentaires_runapp" style="min-height: 130px;"></textarea>
+          </div>
+        </section>
+
+        <!-- ZONE DE SIGNATURE FICHE 3 -->
+        <section class="signature-section">
+          <h2>Engagement et signatures</h2>
+          <div class="signature-grid">
+            <div class="signature-box">
+              <h3>L'apprenant</h3>
+              <div class="engagement-text">
+                <label for="f3_engagement_apprenant" style="font-weight:400;">Je certifie l'exactitude des informations fournies et valide ce bilan de formation :</label>
+                <textarea id="f3_engagement_apprenant" name="engagement_apprenant" placeholder="Commentaire ou engagement (optionnel)"></textarea>
+              </div>
+              <label style="font-weight:600; display:block; margin-bottom:6px;">Signature :</label>
+              <div class="signature-canvas-wrapper">
+                <canvas id="f3_canvas_apprenant" class="signature-canvas" width="400" height="150"></canvas>
+              </div>
+              <div class="signature-actions">
+                <button type="button" onclick="clearSignature('f3_canvas_apprenant')">Effacer</button>
+              </div>
+            </div>
+
+            <div class="signature-box">
+              <h3>L'intervenant RunApp</h3>
+              <div class="engagement-text">
+                <label for="f3_engagement_intervenant" style="font-weight:400;">Je certifie l'exactitude de ce bilan final et valide l'accompagnement réalisé :</label>
+                <textarea id="f3_engagement_intervenant" name="engagement_intervenant" placeholder="Commentaire ou engagement (optionnel)"></textarea>
+              </div>
+              <label style="font-weight:600; display:block; margin-bottom:6px;">Signature :</label>
+              <div class="signature-canvas-wrapper">
+                <canvas id="f3_canvas_intervenant" class="signature-canvas" width="400" height="150"></canvas>
+              </div>
+              <div class="signature-actions">
+                <button type="button" onclick="clearSignature('f3_canvas_intervenant')">Effacer</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </form>
+    </div>
+
+    <div class="footer">
+      <p><strong>© 2026 SALMACIS Aurélie - Tous droits réservés</strong><br>
+      RunApp – Conseil, Formation, Accompagnement<br>
+      Document généré via le formulaire web RunApp</p>
+    </div>
+
+    <div id="saveIndicator" class="save-indicator">Sauvegarde automatique...</div>
+  </div>
+
+  <script>
+    // ======================== NAVIGATION ENTRE FICHES ========================
+    function switchFiche(ficheNum){
+      [1,2,3].forEach(i => {
+        const container = document.getElementById('fiche' + i);
+        const btn = document.querySelector(`.fiche-nav button:nth-child(${i})`);
+        if(i === ficheNum){
+          container.classList.add('active');
+          btn.classList.add('active');
+        } else {
+          container.classList.remove('active');
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // ======================== GESTION DES SIGNATURES ========================
+    const signatureCanvases = {};
+
+    function setupSignatureCanvas(canvasId){
+      const canvas = document.getElementById(canvasId);
+      if(!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      let isDrawing = false;
+      let lastX = 0;
+      let lastY = 0;
+
+      signatureCanvases[canvasId] = {canvas, ctx};
+
+      // Style de tracé
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      function startDrawing(e){
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+        lastX = x;
+        lastY = y;
+      }
+
+      function draw(e){
+        if(!isDrawing) return;
+        e.preventDefault();
+
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        lastX = x;
+        lastY = y;
+      }
+
+      function stopDrawing(){
+        isDrawing = false;
+      }
+
+      // Events souris
+      canvas.addEventListener('mousedown', startDrawing);
+      canvas.addEventListener('mousemove', draw);
+      canvas.addEventListener('mouseup', stopDrawing);
+      canvas.addEventListener('mouseout', stopDrawing);
+
+      // Events tactiles
+      canvas.addEventListener('touchstart', startDrawing);
+      canvas.addEventListener('touchmove', draw);
+      canvas.addEventListener('touchend', stopDrawing);
+    }
+
+    function clearSignature(canvasId){
+      const sig = signatureCanvases[canvasId];
+      if(!sig) return;
+      sig.ctx.clearRect(0, 0, sig.canvas.width, sig.canvas.height);
+    }
+
+    // ======================== VALIDATION DES DATES ========================
+    function parseDDMMYYYY(str){
+      str = (str || "").trim();
+      if(!str) return { ok: true, date: null, error: "Champ vide" };
+
+      const parts = str.split('/');
+      if(parts.length !== 3) return { ok: false, error: "Format attendu JJ/MM/AAAA" };
+
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+
+      if(isNaN(day) || isNaN(month) || isNaN(year))
+        return { ok: false, error: "Valeurs numériques invalides" };
+
+      if(year < 1900 || year > 2100)
+        return { ok: false, error: "Année hors plage (1900-2100)" };
+
+      if(month < 1 || month > 12)
+        return { ok: false, error: "Mois invalide (1-12)" };
+
+      const daysInMonth = [31, (year%4===0 && year%100!==0) || (year%400===0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+      if(day < 1 || day > daysInMonth[month - 1])
+        return { ok: false, error: "Jour invalide pour ce mois" };
+
+      const date = new Date(year, month - 1, day);
+      return { ok: true, date, error: null };
+    }
+
+    function validateDatesFiche1(){
+      const form = document.getElementById('runappForm1');
+      const errors = [];
+
+      const dateEntretien = parseDDMMYYYY(form.elements['date_entretien']?.value || "");
+      if(!dateEntretien.ok) errors.push("Date de l'entretien : " + dateEntretien.error);
+
+      const dateDebut = parseDDMMYYYY(form.elements['date_debut_formation']?.value || "");
+      if(!dateDebut.ok) errors.push("Date de début de formation : " + dateDebut.error);
+
+      const prochaineDate = parseDDMMYYYY(form.elements['prochain_rdv']?.value || "");
+      if(!prochaineDate.ok) errors.push("Prochain rendez-vous : " + prochaineDate.error);
+
+      const box = document.getElementById('f1_dateErrors');
+      if(errors.length){
+        box.style.display = 'block';
+        box.innerHTML = "<strong>Vérifier les dates :</strong><br>" + errors.map(e => "- " + e).join("<br>");
+        return false;
+      } else {
+        box.style.display = 'none';
+        box.textContent = "";
+        return true;
+      }
+    }
+
+    function validateDatesFiche2(){
+      const form = document.getElementById('runappForm2');
+      const errors = [];
+
+      const dateEntretien = parseDDMMYYYY(form.elements['date_entretien']?.value || "");
+      if(!dateEntretien.ok) errors.push("Date de l'entretien : " + dateEntretien.error);
+
+      const deb = parseDDMMYYYY(form.elements['periode_debut']?.value || "");
+      if(!deb.ok) errors.push("Période — date de début : " + deb.error);
+
+      const fin = parseDDMMYYYY(form.elements['periode_fin']?.value || "");
+      if(!fin.ok) errors.push("Période — date de fin : " + fin.error);
+
+      if(deb.ok && fin.ok && deb.date && fin.date && fin.date < deb.date){
+        errors.push("Période : la date de fin ne peut pas être antérieure à la date de début.");
+      }
+
+      ['plan_ech_1','plan_ech_2','plan_ech_3'].forEach((k, idx) => {
+        const res = parseDDMMYYYY(form.elements[k]?.value || "");
+        if(!res.ok) errors.push("Plan d'action — échéance " + (idx+1) + " : " + res.error);
+      });
+
+      const box = document.getElementById('f2_dateErrors');
+      if(errors.length){
+        box.style.display = 'block';
+        box.innerHTML = "<strong>Vérifier les dates :</strong><br>" + errors.map(e => "- " + e).join("<br>");
+        return false;
+      } else {
+        box.style.display = 'none';
+        box.textContent = "";
+        return true;
+      }
+    }
+
+    function validateDatesFiche3(){
+      const form = document.getElementById('runappForm3');
+      const errors = [];
+
+      const dateEntretien = parseDDMMYYYY(form.elements['date_entretien']?.value || "");
+      if(!dateEntretien.ok) errors.push("Date de l'entretien : " + dateEntretien.error);
+
+      const dateDebut = parseDDMMYYYY(form.elements['date_debut_formation']?.value || "");
+      if(!dateDebut.ok) errors.push("Date de début de formation : " + dateDebut.error);
+
+      const dateFin = parseDDMMYYYY(form.elements['date_fin_formation']?.value || "");
+      if(!dateFin.ok) errors.push("Date de fin de formation : " + dateFin.error);
+
+      if(dateDebut.ok && dateFin.ok && dateDebut.date && dateFin.date && dateFin.date < dateDebut.date){
+        errors.push("La date de fin de formation ne peut pas être antérieure à la date de début.");
+      }
+
+      const dateCertif = parseDDMMYYYY(form.elements['date_certification']?.value || "");
+      if(!dateCertif.ok) errors.push("Date de certification : " + dateCertif.error);
+
+      const box = document.getElementById('f3_dateErrors');
+      if(errors.length){
+        box.style.display = 'block';
+        box.innerHTML = "<strong>Vérifier les dates :</strong><br>" + errors.map(e => "- " + e).join("<br>");
+        return false;
+      } else {
+        box.style.display = 'none';
+        box.textContent = "";
+        return true;
+      }
+    }
+
+    // ======================== SAUVEGARDE AUTOMATIQUE ========================
+    const storageKeys = {
+      1: 'runapp_fiche1_accueil_v1',
+      2: 'runapp_fiche2_trimestriel_v1',
+      3: 'runapp_fiche3_bilan_v1'
+    };
+
+    function showSaved(){
+      const indicator = document.getElementById('saveIndicator');
+      indicator.classList.add('show');
+      setTimeout(() => indicator.classList.remove('show'), 1600);
+    }
+
+    function loadFormData(ficheNum){
+      const form = document.getElementById('runappForm' + ficheNum);
+      const saved = localStorage.getItem(storageKeys[ficheNum]);
+      if(!saved) return;
+
+      const data = JSON.parse(saved);
+      Object.keys(data).forEach((key) => {
+        const el = form.elements[key];
+        if(!el) return;
+
+        if (el.type === 'checkbox') {
+          el.checked = !!data[key];
+          return;
+        }
+        if (el.type === 'radio') {
+          const r = form.querySelector(`input[name="${key}"][value="${data[key]}"]`);
+          if(r) r.checked = true;
+          return;
+        }
+        el.value = data[key];
+      });
+
+      // Charger les signatures
+      if(data['signature_apprenant_' + ficheNum]){
+        const canvas = document.getElementById('f' + ficheNum + '_canvas_apprenant');
+        if(canvas){
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          img.onload = () => ctx.drawImage(img, 0, 0);
+          img.src = data['signature_apprenant_' + ficheNum];
+        }
+      }
+
+      if(data['signature_intervenant_' + ficheNum]){
+        const canvas = document.getElementById('f' + ficheNum + '_canvas_intervenant');
+        if(canvas){
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          img.onload = () => ctx.drawImage(img, 0, 0);
+          img.src = data['signature_intervenant_' + ficheNum];
+        }
+      }
+
+      if(ficheNum === 1) validateDatesFiche1();
+      if(ficheNum === 2) validateDatesFiche2();
+      if(ficheNum === 3) validateDatesFiche3();
+    }
+
+    function setupAutoSave(ficheNum){
+      const form = document.getElementById('runappForm' + ficheNum);
+      
+      form.addEventListener('input', () => {
+        saveFormData(ficheNum);
+      });
+
+      // Sauvegarder aussi quand on dessine sur les canvas
+      const canvasApprenant = document.getElementById('f' + ficheNum + '_canvas_apprenant');
+      const canvasIntervenant = document.getElementById('f' + ficheNum + '_canvas_intervenant');
+      
+      if(canvasApprenant){
+        canvasApprenant.addEventListener('mouseup', () => saveFormData(ficheNum));
+        canvasApprenant.addEventListener('touchend', () => saveFormData(ficheNum));
+      }
+      
+      if(canvasIntervenant){
+        canvasIntervenant.addEventListener('mouseup', () => saveFormData(ficheNum));
+        canvasIntervenant.addEventListener('touchend', () => saveFormData(ficheNum));
+      }
+    }
+
+    function saveFormData(ficheNum){
+      const form = document.getElementById('runappForm' + ficheNum);
+      const fd = new FormData(form);
+      const obj = {};
+      for (const [k, v] of fd.entries()) obj[k] = v;
+
+      // Gestion des checkboxes (Fiche 2 uniquement)
+      if(ficheNum === 2){
+        const v = form.elements['validation_engagement'];
+        obj['validation_engagement'] = v ? v.checked : false;
+      }
+
+      // Sauvegarder les signatures en base64
+      const canvasApprenant = document.getElementById('f' + ficheNum + '_canvas_apprenant');
+      const canvasIntervenant = document.getElementById('f' + ficheNum + '_canvas_intervenant');
+      
+      if(canvasApprenant){
+        obj['signature_apprenant_' + ficheNum] = canvasApprenant.toDataURL();
+      }
+      
+      if(canvasIntervenant){
+        obj['signature_intervenant_' + ficheNum] = canvasIntervenant.toDataURL();
+      }
+
+      localStorage.setItem(storageKeys[ficheNum], JSON.stringify(obj));
+      showSaved();
+
+      if(ficheNum === 1) validateDatesFiche1();
+      if(ficheNum === 2) validateDatesFiche2();
+      if(ficheNum === 3) validateDatesFiche3();
+    }
+
+    // ======================== ACTIONS (PRINT, RESET, EXPORT) ========================
+    function printForm(ficheNum){
+      if(ficheNum === 4){
+        // Pour la fiche d'analyse, pas besoin de valider les dates
+        window.print();
+        return;
+      }
+      
+      const validateFn = ficheNum === 1 ? validateDatesFiche1 : ficheNum === 2 ? validateDatesFiche2 : validateDatesFiche3;
+      const ok = validateFn();
+      if(!ok){
+        if(!confirm("Certaines dates semblent invalides. Souhaitez-vous imprimer quand même ?")) return;
+      }
+      window.print();
+    }
+
+    function resetForm(ficheNum){
+      if(!confirm("Êtes-vous sûr de vouloir réinitialiser ? Les données sauvegardées (y compris les signatures) seront supprimées.")) return;
+      const form = document.getElementById('runappForm' + ficheNum);
+      form.reset();
+      
+      // Effacer les signatures
+      clearSignature('f' + ficheNum + '_canvas_apprenant');
+      clearSignature('f' + ficheNum + '_canvas_intervenant');
+      
+      localStorage.removeItem(storageKeys[ficheNum]);
+      
+      if(ficheNum === 1) validateDatesFiche1();
+      if(ficheNum === 2) validateDatesFiche2();
+      if(ficheNum === 3) validateDatesFiche3();
+    }
+
+    function exportJSON(ficheNum){
+      const form = document.getElementById('runappForm' + ficheNum);
+      const validateFn = ficheNum === 1 ? validateDatesFiche1 : ficheNum === 2 ? validateDatesFiche2 : validateDatesFiche3;
+      const ok = validateFn();
+      if(!ok){
+        if(!confirm("Certaines dates semblent invalides. Souhaitez-vous exporter quand même ?")) return;
+      }
+
+      const fd = new FormData(form);
+      const obj = {};
+      for (const [k, v] of fd.entries()) obj[k] = v;
+
+      if(ficheNum === 2){
+        const v = form.elements['validation_engagement'];
+        obj['validation_engagement'] = v ? v.checked : false;
+      }
+
+      // Ajouter les signatures à l'export
+      const canvasApprenant = document.getElementById('f' + ficheNum + '_canvas_apprenant');
+      const canvasIntervenant = document.getElementById('f' + ficheNum + '_canvas_intervenant');
+      
+      if(canvasApprenant){
+        obj['signature_apprenant_base64'] = canvasApprenant.toDataURL();
+      }
+      
+      if(canvasIntervenant){
+        obj['signature_intervenant_base64'] = canvasIntervenant.toDataURL();
+      }
+
+      const dataStr = JSON.stringify(obj, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+      const ficheNames = {1: 'accueil', 2: 'trimestriel', 3: 'bilan_final'};
+      const filename =
+        'RUNAPP_FICHE' + ficheNum + '_' + ficheNames[ficheNum] + '_' +
+        (obj.nom_prenom || 'apprenant').trim().replace(/\s+/g,'_') +
+        '_' +
+        (obj.date_entretien || 'date').replace(/\//g,'-') +
+        '.json';
+
+      const a = document.createElement('a');
+      a.setAttribute('href', dataUri);
+      a.setAttribute('download', filename);
+      a.click();
+    }
+
+
+    // ======================== INITIALISATION ========================
+    window.addEventListener('load', () => {
+      // Initialiser les canvas de signature
+      for(let i = 1; i <= 3; i++){
+        setupSignatureCanvas('f' + i + '_canvas_apprenant');
+        setupSignatureCanvas('f' + i + '_canvas_intervenant');
+      }
+
+      // Charger les données sauvegardées
+      loadFormData(1);
+      loadFormData(2);
+      loadFormData(3);
+
+      // Activer la sauvegarde automatique
+      setupAutoSave(1);
+      setupAutoSave(2);
+      setupAutoSave(3);
+    });
+  </script>
+</body>
+</html>
